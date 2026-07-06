@@ -25,14 +25,24 @@ export function titleSimilarity(a: string, b: string): number {
   return inter / (ga.size + gb.size - inter);
 }
 
+export interface DedupThresholds {
+  /** At/above this => treated as a duplicate ("switch to it"). */
+  duplicate: number;
+  /** At/above this (but below duplicate) => a softer "related page" nudge. */
+  related: number;
+}
+
 /**
- * Decide whether a newly opened page is already open in another tab.
+ * Decide whether a newly opened page is a duplicate of, or strongly related
+ * to, another open tab. Two tiers:
+ *   - exact/normalized URL, or high similarity  -> kind 'duplicate'
+ *   - moderate similarity                        -> kind 'related'
  * Order of confidence: exact url > normalized url > semantic > title.
  */
 export function findDuplicate(
   candidate: { normalizedUrl: string; url: string; title: string; embedding?: number[] },
   openTabs: OpenTabRef[],
-  threshold: number,
+  thresholds: DedupThresholds,
   candidateTabId?: number,
 ): DedupMatch | null {
   let best: DedupMatch | null = null;
@@ -40,12 +50,13 @@ export function findDuplicate(
   for (const tab of openTabs) {
     if (tab.tabId === candidateTabId) continue; // don't match the tab against itself
 
-    // 1. Exact / normalized URL.
+    // 1. Exact / normalized URL => always a duplicate.
     if (tab.normalizedUrl === candidate.normalizedUrl && tab.memory) {
       return {
         memory: tab.memory,
         openTabId: tab.tabId,
         similarity: 1,
+        kind: 'duplicate',
         reason: 'normalized-url',
       };
     }
@@ -66,8 +77,18 @@ export function findDuplicate(
       reason = 'title-similar';
     }
 
-    if (sim >= threshold && (!best || sim > best.similarity)) {
-      best = { memory: tab.memory, openTabId: tab.tabId, similarity: sim, reason };
+    // Below the "related" floor => not interesting.
+    if (sim < thresholds.related) continue;
+
+    const kind: DedupMatch['kind'] = sim >= thresholds.duplicate ? 'duplicate' : 'related';
+
+    // Prefer higher similarity; and always prefer a duplicate over a related.
+    const better =
+      !best ||
+      (kind === 'duplicate' && best.kind === 'related') ||
+      (kind === best.kind && sim > best.similarity);
+    if (better) {
+      best = { memory: tab.memory, openTabId: tab.tabId, similarity: sim, kind, reason };
     }
   }
 

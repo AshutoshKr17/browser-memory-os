@@ -94,17 +94,49 @@ export function SettingsView() {
       )}
 
       <div className="field">
-        <label>Duplicate-detection sensitivity: {Math.round(settings.dedupThreshold * 100)}%</label>
+        <label>Duplicate threshold: {Math.round(settings.dedupThreshold * 100)}%</label>
         <input
           type="range"
-          min={0.7}
+          min={0.8}
           max={0.99}
           step={0.01}
           value={settings.dedupThreshold}
           onChange={(e) => update({ dedupThreshold: Number(e.target.value) })}
           onMouseUp={(e) => persist({ dedupThreshold: Number((e.target as HTMLInputElement).value) })}
         />
+        <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>
+          At/above this similarity, a page counts as "already open".
+        </div>
       </div>
+
+      <div className="toggle-row">
+        <label style={{ margin: 0 }}>Nudge me about related open tabs</label>
+        <input
+          type="checkbox"
+          checked={settings.relatedEnabled}
+          onChange={(e) => persist({ relatedEnabled: e.target.checked })}
+        />
+      </div>
+
+      {settings.relatedEnabled && (
+        <div className="field">
+          <label>Related threshold: {Math.round(settings.relatedThreshold * 100)}%</label>
+          <input
+            type="range"
+            min={0.5}
+            max={Math.max(0.5, settings.dedupThreshold - 0.02)}
+            step={0.01}
+            value={settings.relatedThreshold}
+            onChange={(e) => update({ relatedThreshold: Number(e.target.value) })}
+            onMouseUp={(e) =>
+              persist({ relatedThreshold: Number((e.target as HTMLInputElement).value) })
+            }
+          />
+          <div style={{ fontSize: 11, color: 'var(--text-faint)' }}>
+            Lower = more "you have a related page open" suggestions.
+          </div>
+        </div>
+      )}
 
       <div className="field">
         <label>Never capture (comma-separated domains)</label>

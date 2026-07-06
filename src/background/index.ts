@@ -221,10 +221,15 @@ async function maybePromptDuplicate(memory: PageMemory, tabId?: number): Promise
       embedding: memory.embedding,
     },
     openTabs,
-    settings.dedupThreshold,
+    {
+      duplicate: settings.dedupThreshold,
+      // If the related nudge is disabled, set the floor to the duplicate bar.
+      related: settings.relatedEnabled ? settings.relatedThreshold : settings.dedupThreshold,
+    },
     tabId,
   );
   if (!match || match.openTabId == null) return;
+  if (match.kind === 'related' && !settings.relatedEnabled) return;
 
   // Inject a lightweight banner into the current tab offering to switch.
   try {
@@ -237,6 +242,7 @@ async function maybePromptDuplicate(memory: PageMemory, tabId?: number): Promise
           title: match.memory.title,
           similarity: Math.round(match.similarity * 100),
           domain: memory.domain,
+          kind: match.kind,
         },
       ],
     });
@@ -251,18 +257,25 @@ function injectDedupBanner(info: {
   title: string;
   similarity: number;
   domain: string;
+  kind: 'duplicate' | 'related';
 }): void {
   const ID = '__bmo_dedup_banner__';
   if (document.getElementById(ID)) return;
+  const isDup = info.kind === 'duplicate';
+  const heading = isDup
+    ? 'Looks like you already have this open'
+    : 'You have a related page open';
+  const switchLabel = isDup ? 'Switch to it' : 'Open the related tab';
+  const accent = isDup ? '#6366f1' : '#0ea5e9';
   const bar = document.createElement('div');
   bar.id = ID;
   bar.style.cssText =
     'position:fixed;top:16px;right:16px;z-index:2147483647;max-width:340px;background:#111827;color:#fff;font:13px/1.4 -apple-system,Segoe UI,Roboto,sans-serif;padding:14px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08)';
   bar.innerHTML =
-    `<div style="font-weight:600;margin-bottom:4px">Looks like you already have this open</div>` +
-    `<div style="opacity:.8;margin-bottom:10px">${info.similarity}% match · "${info.title.replace(/</g, '&lt;').slice(0, 60)}"</div>` +
+    `<div style="font-weight:600;margin-bottom:4px">${heading}</div>` +
+    `<div style="opacity:.8;margin-bottom:10px">${info.similarity}% ${isDup ? 'match' : 'related'} · "${info.title.replace(/</g, '&lt;').slice(0, 60)}"</div>` +
     `<div style="display:flex;gap:8px;flex-wrap:wrap">` +
-    `<button id="${ID}_switch" style="background:#6366f1;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:600">Switch to it</button>` +
+    `<button id="${ID}_switch" style="background:${accent};color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:600">${switchLabel}</button>` +
     `<button id="${ID}_keep" style="background:rgba(255,255,255,.1);color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer">Keep both</button>` +
     `<button id="${ID}_mute" style="background:transparent;color:#9ca3af;border:0;padding:6px 4px;cursor:pointer;font-size:12px">Mute ${info.domain}</button>` +
     `</div>`;

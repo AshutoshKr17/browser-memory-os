@@ -74,6 +74,8 @@ export interface DedupMatch {
   memory: PageMemory;
   openTabId?: number;
   similarity: number;
+  /** 'duplicate' = essentially the same page; 'related' = strongly related. */
+  kind: 'duplicate' | 'related';
   reason: 'exact-url' | 'normalized-url' | 'title-similar' | 'content-similar';
 }
 
@@ -90,7 +92,12 @@ export interface Settings {
   blocklist: string[];
   /** Domains where "switch to existing" prompt is suppressed. */
   dedupDomainMuted: string[];
+  /** Cosine/title similarity at/above which a page is treated as a duplicate. */
   dedupThreshold: number;
+  /** Lower bar for surfacing a "you have a related page open" nudge. */
+  relatedThreshold: number;
+  /** Whether to show the softer "related page" nudge at all. */
+  relatedEnabled: boolean;
   /** Which backend generates summaries. */
   llmProvider: 'local' | 'openai' | 'gemini' | 'ollama' | 'none';
   openaiApiKey?: string;
@@ -108,7 +115,9 @@ export const DEFAULT_SETTINGS: Settings = {
     'chrome.google.com',
   ],
   dedupDomainMuted: [],
-  dedupThreshold: 0.92,
+  dedupThreshold: 0.9,
+  relatedThreshold: 0.72,
+  relatedEnabled: true,
   llmProvider: 'local',
   ollamaUrl: 'http://localhost:11434',
   ollamaModel: 'llama3',
