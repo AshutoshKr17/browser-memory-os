@@ -1,0 +1,29 @@
+{
+  "name": "browser-memory-os",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Browser Memory OS — your browser remembers everything so you can safely close tabs.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@xenova/transformers": "^2.17.2",
+    "dexie": "^4.4.4",
+    "minisearch": "^7.2.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.33",
+    "@types/chrome": "^0.2.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "^6.0.3",
+    "vite": "^5.4.21"
+  }
+}
