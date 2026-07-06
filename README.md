@@ -45,10 +45,10 @@ This extension isn't on the Chrome Web Store yet, so you install it in **Develop
 
 ### Steps
 
-1. **Get the code** — clone the repo (replace with your URL) or download it as a ZIP from the green **Code** button on GitHub and unzip it:
+1. **Get the code** — clone the repo or download it as a ZIP from the green **Code** button on GitHub and unzip it:
 
 ```bash
-git clone https://github.com/<your-username>/browser-memory-os.git
+git clone https://github.com/AshutoshKr17/browser-memory-os.git
 cd browser-memory-os
 ```
 
