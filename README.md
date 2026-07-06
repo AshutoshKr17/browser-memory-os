@@ -39,13 +39,23 @@ Content script  ──PAGE_EXTRACTED──►  Background SW  ──EMBED──�
 
 This extension isn't on the Chrome Web Store yet, so you install it in **Developer mode**. It takes ~2 minutes.
 
-### Requirements
-- Google Chrome, Brave, Edge, or any Chromium-based browser
-- [Node.js 18+](https://nodejs.org) and npm
+### Option A — Download the prebuilt extension (no coding, no Node) ⭐ easiest
 
-### Steps
+1. Go to the [**Releases**](https://github.com/AshutoshKr17/browser-memory-os/releases) page.
+2. Under the latest release, download **`browser-memory-os.zip`**.
+3. Unzip it — you'll get a folder (e.g. `browser-memory-os`).
+4. Open `chrome://extensions` (or `brave://extensions`, `edge://extensions`).
+5. Turn on **Developer mode** (toggle, top-right).
+6. Click **Load unpacked** and select the unzipped folder.
+7. Done — jump to [**Start using it**](#start-using-it) below.
 
-1. **Get the code** — clone the repo or download it as a ZIP from the green **Code** button on GitHub and unzip it:
+> Keep the unzipped folder somewhere permanent; if you delete it, the extension stops working.
+
+### Option B — Build from source
+
+**Requirements:** Google Chrome / Brave / Edge (any Chromium browser) + [Node.js 18+](https://nodejs.org) and npm.
+
+1. **Get the code:**
 
 ```bash
 git clone https://github.com/AshutoshKr17/browser-memory-os.git
@@ -67,15 +77,18 @@ npm run build
    - Click **Load unpacked**
    - Select the **`dist/`** folder inside the project
 
-4. **Start using it:**
-   - Pin the extension from the puzzle-piece menu.
-   - Press **⌘⇧K** (Mac) or **Ctrl+Shift+K** (Windows/Linux), or click the icon, to open the spotlight.
-   - Browse a few pages normally — they get remembered automatically — then search for them in plain language.
+<a id="start-using-it"></a>
+### Start using it
+
+- Pin the extension from the puzzle-piece menu.
+- Press **⌘⇧K** (Mac) or **Ctrl+Shift+K** (Windows/Linux), or click the icon, to open the spotlight.
+- Browse a few pages normally — they get remembered automatically — then search for them in plain language.
 
 > ℹ️ The **first search** downloads a ~25 MB on-device AI model once (then it's cached and works offline). Everything is stored locally in your browser; nothing is uploaded unless you opt into a cloud AI provider in **Settings**.
 
 ### Updating to a new version
-Pull the latest code, rebuild, then click the **↻ reload** icon on the extension card in `chrome://extensions`:
+- **Option A (prebuilt):** download the newer `browser-memory-os.zip` from [Releases](https://github.com/AshutoshKr17/browser-memory-os/releases), unzip over the old folder, then click the **↻ reload** icon on the extension card in `chrome://extensions`.
+- **Option B (source):** pull, rebuild, then reload:
 
 ```bash
 git pull
